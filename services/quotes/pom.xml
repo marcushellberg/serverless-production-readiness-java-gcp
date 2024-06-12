@@ -35,6 +35,7 @@
     <java.version>21</java.version>
     <testcontainers.version>1.19.8</testcontainers.version>
     <spring-framework.version>6.1.8</spring-framework.version>
+    <vaadin.version>24.4.0.rc2</vaadin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -44,11 +45,11 @@
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-cache</artifactId>
-    </dependency>    
+    </dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -56,7 +57,7 @@
 		<dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-		</dependency>    
+		</dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
@@ -64,7 +65,7 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-database-postgresql</artifactId>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
@@ -119,6 +120,10 @@
       <artifactId>toxiproxy</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-spring-boot-starter</artifactId>
+    </dependency>
 
   </dependencies>
 
@@ -128,6 +133,13 @@
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
         <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-bom</artifactId>
+        <version>${vaadin.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -145,7 +157,7 @@
 							<goal>process-aot</goal>
 						</goals>
 					</execution>
-				</executions>        
+				</executions>
 				<!-- <configuration>
           <image>
               <env>
@@ -169,7 +181,23 @@
           </buildArgs>
         </configuration>
       </plugin>
-    </plugins>  
+      <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+        <version>${vaadin.version}</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>prepare-frontend</goal>
+                </goals>
+            </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <repositories>
@@ -189,6 +217,10 @@
         <enabled>false</enabled>
       </releases>
     </repository>
+    <repository>
+        <id>vaadin</id>
+        <url>https://maven.vaadin.com/vaadin-prereleases</url>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -207,6 +239,44 @@
         <enabled>false</enabled>
       </releases>
     </pluginRepository>
+    <pluginRepository>
+        <id>vaadin</id>
+        <url>https://maven.vaadin.com/vaadin-prereleases</url>
+    </pluginRepository>
   </pluginRepositories>
-
+  <profiles>
+    <profile>
+      <!-- Production mode is activated using -Pproduction -->
+      <id>production</id>
+      <dependencies>
+        <!-- Exclude development dependencies from production -->
+        <dependency>
+          <groupId>com.vaadin</groupId>
+          <artifactId>vaadin-core</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>com.vaadin</groupId>
+              <artifactId>vaadin-dev</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-maven-plugin</artifactId>
+            <version>${vaadin.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>build-frontend</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

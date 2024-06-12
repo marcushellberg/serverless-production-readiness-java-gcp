@@ -17,6 +17,10 @@ package com.example.quotes.domain;
 
 import java.util.List;
 import java.util.Optional;
+
+import com.vaadin.hilla.crud.filter.Filter;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,5 +62,9 @@ public class QuoteService {
 
   public void deleteById(Long id){
     quoteRepository.deleteById(id);
+  }
+
+  public List<Quote> list(Pageable pageable, Specification<Quote> spec) {
+    return quoteRepository.findAll(spec, pageable).toList();
   }
 }

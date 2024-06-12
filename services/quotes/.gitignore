@@ -103,3 +103,8 @@ target-native/
 /test-results-native/test/TEST-junit-jupiter.xml
 
 *.iprof
+
+# Vaadin
+src/main/frontend/generated/*
+node_modules/
+
